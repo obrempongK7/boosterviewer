@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="ViewPulse — Boost your YouTube, TikTok and website views automatically with multi-tab iframe sessions.">
+<meta name="theme-color" content="#070a0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ViewPulse">
+<link rel="manifest" id="pwaManifest">
+<title>ViewPulse — Boost Your Reach</title>
+
+<!-- ════════════════════════════════════════════════
+     GOOGLE ADSENSE — YOUR PUBLISHER TAG
+     Replace / add additional ad units below as needed
+     ════════════════════════════════════════════════ -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8714103186224868"
+     crossorigin="anonymous"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+/* ══════════════════════════════════════════════
+   THEME TOKENS
+══════════════════════════════════════════════ */
+:root {
+  --accent:  #00e5ff;
+  --accent2: #ff3c6e;
+  --accent3: #ffe135;
+  --green:   #00ff88;
+  --gold:    #ffd700;
+}
+
+[data-theme="dark"] {
+  --bg:      #070a0f;
+  --surface: #0d1117;
+  --card:    #111820;
+  --border:  #1e2d3d;
+  --text:    #e8f4fd;
+  --muted:   #5a7a96;
+  --shadow:  rgba(0,0,0,0.5);
+  --ad-bg:   linear-gradient(135deg,#1a0a20,#0a1a30);
+}
+
+[data-theme="light"] {
+  --bg:      #f0f4f8;
+  --surface: #ffffff;
+  --card:    #ffffff;
+  --border:  #d0dce8;
+  --text:    #0f1923;
+  --muted:   #6b7fa0;
+  --shadow:  rgba(0,0,0,0.12);
+  --ad-bg:   linear-gradient(135deg,#fce4ec,#e3f2fd);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background 0.3s, color 0.3s;
+}
+
+[data-theme="dark"] body::before {
+  content:'';
+  position:fixed; inset:0;
+  background-image:
+    linear-gradient(rgba(0,229,255,0.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,229,255,0.03) 1px,transparent 1px);
+  background-size:40px 40px;
+  pointer-events:none; z-index:0;
+}
+
+[data-theme="dark"] body::after {
+  content:'';
+  position:fixed; top:-20%; left:50%; transform:translateX(-50%);
+  width:800px; height:400px;
+  background:radial-gradient(ellipse,rgba(0,229,255,0.08) 0%,transparent 70%);
+  pointer-events:none; z-index:0;
+}
+
+.container { max-width:1100px; margin:0 auto; padding:0 24px; position:relative; z-index:1; }
+
+/* ══ TOPBAR ══ */
+.topbar {
+  display: flex; align-items: center; justify-content: flex-end;
+  gap: 10px; padding: 12px 0 0;
+}
+
+.theme-toggle {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 100px; padding: 6px 14px;
+  font-size: 12px; color: var(--muted); cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+  transition: all 0.2s; font-family: 'DM Mono', monospace;
+}
+.theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+
+.premium-pill {
+  background: linear-gradient(135deg, #7b2ff7, #f107a3);
+  border: none; border-radius: 100px; padding: 6px 14px;
+  font-size: 11px; color: #fff; cursor: pointer;
+  display: flex; align-items: center; gap: 5px;
+  font-family: 'DM Mono', monospace; font-weight: 500;
+  transition: all 0.2s; letter-spacing: 0.5px;
+  box-shadow: 0 4px 16px rgba(123,47,247,0.35);
+}
+.premium-pill:hover { transform: scale(1.04); box-shadow: 0 6px 22px rgba(123,47,247,0.5); }
+.premium-pill.active-plan {
+  background: linear-gradient(135deg, var(--gold), #ff8c00);
+  box-shadow: 0 4px 16px rgba(255,215,0,0.4);
+}
+
+/* ══ HEADER ══ */
+header { padding: 20px 0 16px; text-align: center; }
+
+.logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(50px, 9vw, 86px);
+  letter-spacing: 4px; line-height: 1;
+  background: linear-gradient(135deg, var(--accent) 0%, #0080ff 50%, var(--accent2) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  animation: logoGlow 3s ease-in-out infinite alternate;
+}
+@keyframes logoGlow {
+  from { filter: drop-shadow(0 0 20px rgba(0,229,255,0.4)); }
+  to   { filter: drop-shadow(0 0 40px rgba(0,229,255,0.8)); }
+}
+
+.tagline { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:4px; color:var(--muted); text-transform:uppercase; margin-top:6px; }
+
+.status-bar { display:flex; justify-content:center; gap:16px; margin-top:14px; flex-wrap:wrap; }
+.stat-pill  { background:var(--card); border:1px solid var(--border); border-radius:100px; padding:5px 14px; font-family:'DM Mono',monospace; font-size:10px; color:var(--muted); display:flex; align-items:center; gap:7px; }
+.stat-pill .dot { width:6px; height:6px; border-radius:50%; background:var(--green); box-shadow:0 0 7px var(--green); animation:pulse 1.5s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.8)} }
+
+/* ══ ADSENSE SLOTS ══ */
+/* ─────────────────────────────────────────────────
+   ADSENSE INTEGRATION POINTS
+   Slots are labelled so you can identify them:
+   #adsense-top     → Banner below header
+   #adsense-mid     → Between config and session
+   #adsense-bottom  → Footer area
+   #adsense-modal   → Inside 15-second ad modal
+   ───────────────────────────────────────────────── */
+.adsense-slot {
+  width: 100%; margin: 16px 0;
+  min-height: 90px;
+  background: var(--ad-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+}
+.adsense-slot::before {
+  content: 'ADVERTISEMENT';
+  position: absolute; top: 5px; right: 10px;
+  font-family: 'DM Mono', monospace; font-size: 8px;
+  color: var(--muted); letter-spacing: 2px;
+}
+.adsense-slot ins { display: block !important; width: 100% !important; }
+
+/* fallback placeholder when AdSense hasn't filled yet */
+.adsense-slot .ad-placeholder {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 18px; width: 100%; flex-wrap: wrap;
+}
+.ad-ph-icon { width:40px;height:40px;border-radius:9px;background:linear-gradient(135deg,var(--accent2),#ff8a00);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0; }
+.ad-ph-text h4 { font-size:13px;font-weight:600;margin-bottom:2px; }
+.ad-ph-text p  { font-size:11px;color:var(--muted); }
+.ad-ph-cta { margin-left:auto; background:linear-gradient(135deg,var(--accent2),#ff8a00);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap; }
+.ad-ph-cta:hover { transform:scale(1.04); }
+
+/* ══ MAIN CARD ══ */
+.main-card { background:var(--card); border:1px solid var(--border); border-radius:20px; overflow:hidden; margin-bottom:20px; box-shadow:0 4px 24px var(--shadow); }
+.card-header { padding:20px 26px 14px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:12px; }
+.card-header-icon { width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px; }
+.card-title    { font-size:15px;font-weight:600; }
+.card-subtitle { font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:2px; }
+.card-body     { padding:22px 26px; }
+
+.url-section { margin-bottom:20px; }
+.label { font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:9px;display:flex;align-items:center;gap:7px; }
+.label-badge { background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.2);color:var(--accent);border-radius:4px;padding:1px 6px;font-size:9px; }
+.url-input-wrap { position:relative; }
+.platform-icon { position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:17px;z-index:2; }
+.url-input { width:100%;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:13px 13px 13px 44px;color:var(--text);font-family:'DM Mono',monospace;font-size:12px;outline:none;transition:all 0.2s; }
+.url-input:focus { border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,229,255,0.08); }
+.url-input::placeholder { color:var(--muted); }
+.url-hint { font-size:11px;color:var(--muted);margin-top:6px;font-family:'DM Mono',monospace; }
+.url-hint span { color:var(--accent); }
+
+.controls-grid { display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px; }
+@media(max-width:560px){ .controls-grid{grid-template-columns:1fr;} }
+
+.slider-track { position:relative;height:6px;background:var(--surface);border-radius:100px;margin:10px 0 5px;border:1px solid var(--border); }
+.slider-fill  { position:absolute;left:0;top:0;height:100%;border-radius:100px;background:linear-gradient(90deg,var(--accent),#0080ff);pointer-events:none;transition:width 0.1s; }
+input[type=range] { position:absolute;inset:-7px 0;width:100%;opacity:0;cursor:pointer;z-index:2; }
+.slider-thumb { position:absolute;top:50%;transform:translate(-50%,-50%);width:18px;height:18px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px rgba(0,229,255,0.6);pointer-events:none;transition:left 0.1s; }
+.slider-value { font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--accent);letter-spacing:1px;line-height:1; }
+.slider-value span { font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-left:3px; }
+.slider-minmax { display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted); }
+
+.premium-slider-note { font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);margin-top:4px;display:none; }
+.premium-slider-note.show { display:block; }
+
+.notice { background:rgba(255,225,53,0.05);border:1px solid rgba(255,225,53,0.2);border-radius:12px;padding:12px 16px;font-size:11px;color:#c8b84a;font-family:'DM Mono',monospace;line-height:1.7;margin-bottom:20px; }
+.notice strong { color:var(--accent3); }
+
+.launch-btn { width:100%;padding:16px;background:linear-gradient(135deg,var(--accent) 0%,#0060cc 100%);border:none;border-radius:14px;color:#000;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden; }
+.launch-btn::before { content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.15),transparent);opacity:0;transition:opacity 0.2s; }
+.launch-btn:hover::before { opacity:1; }
+.launch-btn:hover { transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,229,255,0.4); }
+.launch-btn:disabled { opacity:0.4;cursor:not-allowed;transform:none;box-shadow:none; }
+
+/* ══ SESSION PANEL ══ */
+.session-panel { background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden;margin-bottom:20px;display:none;box-shadow:0 4px 24px var(--shadow); }
+.session-panel.active { display:block;animation:slideIn 0.4s ease; }
+@keyframes slideIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+.session-header { padding:16px 26px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px; }
+.session-title  { display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600; }
+.live-badge     { background:rgba(255,60,110,0.15);border:1px solid rgba(255,60,110,0.4);color:var(--accent2);border-radius:100px;padding:3px 10px;font-family:'DM Mono',monospace;font-size:10px;display:flex;align-items:center;gap:5px; }
+.live-badge .dot { width:6px;height:6px;border-radius:50%;background:var(--accent2);animation:pulse 1s ease-in-out infinite; }
+.stop-btn { background:rgba(255,60,110,0.1);border:1px solid rgba(255,60,110,0.3);color:var(--accent2);border-radius:10px;padding:7px 15px;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:'DM Sans',sans-serif; }
+.stop-btn:hover { background:rgba(255,60,110,0.25); }
+
+.tabs-nav { display:flex;border-bottom:1px solid var(--border);overflow-x:auto;scroll-behavior:smooth;scrollbar-width:none; }
+.tabs-nav::-webkit-scrollbar { display:none; }
+.tab-btn { flex-shrink:0;padding:9px 14px;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);background:transparent;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:6px;white-space:nowrap; }
+.tab-btn:hover  { color:var(--text);background:rgba(128,128,128,0.05); }
+.tab-btn.active { color:var(--accent);border-bottom-color:var(--accent); }
+.tab-dot { width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0;transition:all 0.3s; }
+.tab-btn.loading .tab-dot   { background:var(--accent);box-shadow:0 0 6px var(--accent);animation:pulse 0.8s infinite; }
+.tab-btn.loaded .tab-dot    { background:var(--green);box-shadow:0 0 6px var(--green); }
+.tab-btn.resetting .tab-dot { background:var(--accent3);box-shadow:0 0 6px var(--accent3);animation:pulse 0.5s infinite; }
+.tab-timer { font-family:'Bebas Neue',sans-serif;font-size:12px;color:var(--muted); }
+.tab-btn.loaded .tab-timer   { color:var(--green); }
+.tab-btn.resetting .tab-timer { color:var(--accent3); }
+
+.global-progress { height:3px;background:var(--border);overflow:hidden; }
+.global-progress-fill { height:100%;background:linear-gradient(90deg,var(--accent),var(--green));width:0%;transition:width 1s linear; }
+
+.iframe-viewport { position:relative;width:100%;height:580px;background:var(--surface);overflow:hidden; }
+.iframe-slot { position:absolute;inset:0;display:none;flex-direction:column; }
+.iframe-slot.active { display:flex; }
+.iframe-bar { display:flex;align-items:center;gap:10px;padding:7px 14px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0; }
+.iframe-bar-url { flex:1;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.iframe-bar-reload { background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.2);color:var(--accent);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap;font-family:'DM Sans',sans-serif; }
+.iframe-bar-reload:hover { background:rgba(0,229,255,0.18); }
+.iframe-bar-views { font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);white-space:nowrap; }
+.iframe-bar-views strong { color:var(--green); }
+.iframe-countdown { position:absolute;bottom:14px;right:14px;width:52px;height:52px;z-index:10;pointer-events:none; }
+.iframe-countdown svg { transform:rotate(-90deg); }
+.count-ring { fill:none;stroke:var(--accent);stroke-width:3;stroke-linecap:round;stroke-dasharray:138;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear; }
+.count-ring.warn { stroke:var(--accent3); }
+.count-num { position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--accent); }
+.count-num.warn { color:var(--accent3); }
+iframe.content-frame { flex:1;width:100%;border:none;background:#fff; }
+.iframe-blocked { flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:32px;text-align:center;background:var(--surface); }
+.iframe-blocked h3 { font-size:16px;font-weight:600; }
+.iframe-blocked p  { font-size:12px;color:var(--muted);line-height:1.7;max-width:360px; }
+.open-link-btn { background:linear-gradient(135deg,var(--accent),#0060cc);color:#000;border:none;border-radius:10px;padding:11px 22px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;cursor:pointer;transition:all 0.2s; }
+.open-link-btn:hover { transform:scale(1.03); }
+
+/* ── MID-SESSION ADSENSE STRIP ── */
+.session-adsense { margin: 0; padding: 0 26px; }
+
+.stats-bar { display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--border); }
+.stat-cell { padding:14px 18px;text-align:center; }
+.stat-cell+.stat-cell { border-left:1px solid var(--border); }
+.stat-num { font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--accent);line-height:1; }
+.stat-lbl { font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:2px; }
+
+/* ══ HOW GRID ══ */
+.how-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:28px; }
+.how-card  { background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:0 2px 12px var(--shadow); }
+.how-num   { font-family:'Bebas Neue',sans-serif;font-size:44px;color:var(--border);line-height:1;margin-bottom:6px; }
+.how-title { font-size:13px;font-weight:600;margin-bottom:5px; }
+.how-desc  { font-size:11px;color:var(--muted);line-height:1.6; }
+
+footer { text-align:center;padding:22px;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);border-top:1px solid var(--border); }
+
+/* ══ TOASTS ══ */
+.toast-container { position:fixed;top:18px;right:18px;z-index:9999;display:flex;flex-direction:column;gap:7px; }
+.toast { background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:12px;font-family:'DM Sans',sans-serif;max-width:270px;animation:toastIn 0.3s ease;display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px var(--shadow); }
+.toast.success { border-color:rgba(0,255,136,0.4); }
+.toast.warning { border-color:rgba(255,225,53,0.4); }
+.toast.error   { border-color:rgba(255,60,110,0.4); }
+@keyframes toastIn { from{opacity:0;transform:translateX(18px)} to{opacity:1;transform:translateX(0)} }
+
+/* ══ MODALS ══ */
+.modal-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9998;display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px);padding:20px; }
+.modal-overlay.show { display:flex;animation:fadeIn 0.3s ease; }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+.modal-box { background:var(--card);border:1px solid var(--border);border-radius:22px;padding:32px;max-width:480px;width:100%;position:relative;box-shadow:0 24px 80px rgba(0,0,0,0.5); }
+.modal-close { position:absolute;top:16px;right:16px;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;transition:color 0.2s; }
+.modal-close:hover { color:var(--text); }
+.modal-title { font-size:18px;font-weight:700;margin-bottom:6px; }
+.modal-sub   { font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:22px; }
+
+/* ══ AD MODAL (15s with AdSense slot) ══ */
+.ad-modal-progress { position:absolute;top:0;left:0;right:0;height:4px;background:var(--border);border-radius:22px 22px 0 0;overflow:hidden; }
+.ad-modal-progress-fill { height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent3));width:100%;border-radius:22px 22px 0 0; }
+.ad-modal-tag   { font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-bottom:12px;text-align:center; }
+
+/* ── AdSense inside modal ── */
+.ad-modal-adsense {
+  width:100%;min-height:120px;margin-bottom:16px;
+  background:var(--surface);border:1px dashed var(--border);border-radius:10px;
+  overflow:hidden;display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+.ad-modal-adsense::before { content:'ADVERTISEMENT'; position:absolute;top:4px;right:8px;font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:2px; }
+/* Fallback visual if AdSense hasn't filled */
+.ad-modal-adsense .modal-ad-fallback { padding:16px;text-align:center; }
+.ad-modal-visual { width:80px;height:80px;border-radius:16px;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:40px;background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid var(--border); }
+
+.ad-timer-ring-wrap { position:relative;width:72px;height:72px;margin:0 auto 16px; }
+.ad-timer-ring-wrap svg { transform:rotate(-90deg); }
+.ad-ring-bg   { fill:none;stroke:var(--border);stroke-width:4; }
+.ad-ring-fill { fill:none;stroke:var(--accent2);stroke-width:4;stroke-linecap:round;stroke-dasharray:213.6;stroke-dashoffset:0; }
+.ad-ring-num  { position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--accent2);line-height:1; }
+
+.ad-modal-title { font-size:17px;font-weight:700;text-align:center;margin-bottom:6px; }
+.ad-modal-desc  { font-size:12px;color:var(--muted);text-align:center;line-height:1.6;margin-bottom:18px; }
+
+.ad-modal-skip { background:linear-gradient(135deg,var(--accent),#0060cc);color:#000;border:none;border-radius:12px;padding:13px 30px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;cursor:pointer;transition:all 0.2s;width:100%;display:none; }
+.ad-modal-skip.show { display:block;animation:slideIn 0.3s ease; }
+.ad-modal-skip:hover { transform:scale(1.02); }
+.ad-skip-note { font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:10px;text-align:center; }
+
+/* ══ PREMIUM MODAL ══ */
+.premium-header { display:flex;align-items:center;gap:12px;margin-bottom:20px; }
+.premium-crown  { font-size:32px; }
+.premium-badge  { background:linear-gradient(135deg,#7b2ff7,#f107a3);color:#fff;border-radius:8px;padding:3px 10px;font-size:10px;font-family:'DM Mono',monospace;letter-spacing:1px; }
+
+.plan-cards { display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px; }
+@media(max-width:460px){ .plan-cards{grid-template-columns:1fr;} }
+
+.plan-card { border:2px solid var(--border);border-radius:16px;padding:18px;cursor:pointer;transition:all 0.2s;text-align:center; }
+.plan-card:hover { border-color:var(--accent); }
+.plan-card.selected { border-color:var(--accent);background:rgba(0,229,255,0.05); }
+.plan-card.popular  { border-color:#7b2ff7; }
+.plan-popular-tag   { background:linear-gradient(135deg,#7b2ff7,#f107a3);color:#fff;border-radius:100px;padding:3px 12px;font-size:10px;font-family:'DM Mono',monospace;display:inline-block;margin-bottom:10px; }
+.plan-name  { font-size:13px;font-weight:700;margin-bottom:4px; }
+.plan-price { font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--accent);letter-spacing:1px;line-height:1; }
+.plan-period { font-size:11px;color:var(--muted);font-family:'DM Mono',monospace; }
+.plan-features { list-style:none;margin-top:10px;font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;text-align:left; }
+.plan-features li { padding:3px 0; }
+.plan-features li::before { content:'✓ ';color:var(--green); }
+
+.paystack-btn { width:100%;padding:15px;background:linear-gradient(135deg,#7b2ff7,#f107a3);border:none;border-radius:12px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;cursor:pointer;transition:all 0.2s;margin-bottom:14px; }
+.paystack-btn:hover { transform:translateY(-2px);box-shadow:0 10px 30px rgba(123,47,247,0.5); }
+
+.divider { display:flex;align-items:center;gap:10px;margin:14px 0; }
+.divider span { font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);white-space:nowrap; }
+.divider::before,.divider::after { content:'';flex:1;height:1px;background:var(--border); }
+
+.code-input-wrap { display:flex;gap:10px; }
+.code-input { flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;letter-spacing:3px;text-transform:uppercase; }
+.code-input:focus { border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,215,0,0.1); }
+.code-input::placeholder { text-transform:none;letter-spacing:0;color:var(--muted); }
+.code-activate-btn { background:linear-gradient(135deg,var(--gold),#ff8c00);color:#000;border:none;border-radius:10px;padding:12px 18px;font-weight:700;font-size:13px;cursor:pointer;transition:all 0.2s;white-space:nowrap; }
+.code-activate-btn:hover { transform:scale(1.04); }
+
+.premium-active-banner { background:linear-gradient(135deg,rgba(123,47,247,0.15),rgba(241,7,163,0.1));border:1px solid rgba(123,47,247,0.4);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:12px; }
+.pab-icon { font-size:28px; }
+.pab-text h4 { font-size:14px;font-weight:700; }
+.pab-text p  { font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:2px; }
+
+/* ══ INSTALL BANNER (PWA) ══ */
+.install-banner { background:linear-gradient(135deg,rgba(0,229,255,0.08),rgba(0,128,255,0.08));border:1px solid rgba(0,229,255,0.2);border-radius:12px;padding:12px 18px;margin-bottom:16px;display:none;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap; }
+.install-banner.show { display:flex;animation:slideIn 0.4s ease; }
+.install-text { font-size:12px;font-family:'DM Mono',monospace;color:var(--muted); }
+.install-text strong { color:var(--accent); }
+.install-btn  { background:var(--accent);color:#000;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;white-space:nowrap; }
+.install-btn:hover { transform:scale(1.04); }
+.install-dismiss { background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:8px 12px;font-size:12px;cursor:pointer; }
+</style>
+</head>
+<body>
+
+<!-- ── TOAST CONTAINER ── -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ══════════════════════════════════════════
+     AD MODAL (15 seconds) with AdSense slot
+══════════════════════════════════════════ -->
+<div class="modal-overlay" id="adOverlay">
+  <div class="modal-box" style="max-width:460px;text-align:center;">
+    <div class="ad-modal-progress">
+      <div class="ad-modal-progress-fill" id="adProgressFill"></div>
+    </div>
+    <div class="ad-modal-tag" style="margin-top:12px;">📢 Advertisement — Keeps ViewPulse Free</div>
+
+    <!-- ══════════════════════════════════════════
+         ADSENSE SLOT — MODAL (15-second ad)
+         Publisher: ca-pub-8714103186224868
+         Replace the ins tag with your ad unit code
+    ══════════════════════════════════════════ -->
+    <div class="ad-modal-adsense" id="adModalAdsense">
+      <!-- ADSENSE AD UNIT — MODAL -->
+      <ins class="adsbygoogle"
+           style="display:block;width:100%;min-height:120px;"
+           data-ad-client="ca-pub-8714103186224868"
+           data-ad-slot="YOUR_MODAL_AD_SLOT_ID"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+      <!-- Fallback shown while AdSense loads -->
+      <div class="modal-ad-fallback" id="adModalFallback">
+        <div class="ad-modal-visual" id="adModalEmoji">🚀</div>
+        <div class="ad-modal-title" id="adModalTitle">ProBoost Growth Suite</div>
+        <div class="ad-modal-desc" id="adModalDesc">Reach millions with targeted social campaigns. Used by 50K+ creators worldwide.</div>
+      </div>
+    </div>
+
+    <div class="ad-timer-ring-wrap">
+      <svg width="72" height="72" viewBox="0 0 80 80">
+        <circle class="ad-ring-bg" cx="40" cy="40" r="34"/>
+        <circle class="ad-ring-fill" id="adRingFill" cx="40" cy="40" r="34"/>
+      </svg>
+      <div class="ad-ring-num" id="adTimerNum">15</div>
+    </div>
+
+    <button class="ad-modal-skip" id="adSkipBtn" onclick="closeAd()">▶ CONTINUE BOOSTING</button>
+    <div class="ad-skip-note" id="adSkipNote">Ad plays for <span id="adSkipCountdown">15</span>s — skip unlocks after</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PREMIUM MODAL
+══════════════════════════════════════════ -->
+<div class="modal-overlay" id="premiumModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closePremiumModal()">✕</button>
+
+    <div id="premiumActiveView" style="display:none;">
+      <div class="premium-active-banner">
+        <div class="pab-icon">👑</div>
+        <div class="pab-text">
+          <h4>Premium Active — <span id="premiumPlanName">Pro</span> Plan</h4>
+          <p id="premiumExpiry">Expires: —</p>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:14px;line-height:1.7;">
+        You have access to up to <strong style="color:var(--gold);">100 iframe tabs</strong>, no session ads, and priority reloads.
+      </p>
+      <button class="paystack-btn" style="margin-top:18px;" onclick="deactivatePremium()">🔓 Deactivate Premium</button>
+    </div>
+
+    <div id="premiumSignupView">
+      <div class="premium-header">
+        <div class="premium-crown">👑</div>
+        <div>
+          <div class="modal-title">Upgrade to Premium</div>
+          <div class="modal-sub">// unlock 100 iframe tabs &amp; no ads</div>
+        </div>
+        <div class="premium-badge">PRO</div>
+      </div>
+
+      <div class="plan-cards">
+        <div class="plan-card" id="planMonthly" onclick="selectPlan('monthly')">
+          <div class="plan-name">Monthly</div>
+          <div class="plan-price">₦2,500</div>
+          <div class="plan-period">per month</div>
+          <ul class="plan-features">
+            <li>100 iframe tabs</li>
+            <li>No session ads</li>
+            <li>Priority reload</li>
+          </ul>
+        </div>
+        <div class="plan-card popular selected" id="planAnnual" onclick="selectPlan('annual')">
+          <div class="plan-popular-tag">⚡ BEST VALUE</div>
+          <div class="plan-name">Annual</div>
+          <div class="plan-price">₦20,000</div>
+          <div class="plan-period">per year (save 33%)</div>
+          <ul class="plan-features">
+            <li>100 iframe tabs</li>
+            <li>No session ads</li>
+            <li>Priority reload</li>
+            <li>Early features</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- PAYSTACK BUTTON -->
+      <button class="paystack-btn" onclick="initiatePaystack()">
+        💳 PAY WITH PAYSTACK
+      </button>
+      <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-align:center;margin-bottom:14px;">
+        Secured by Paystack · NG bank cards, USSD, bank transfer
+      </div>
+
+      <div class="divider"><span>OR HAVE AN ADMIN CODE?</span></div>
+
+      <!-- ADMIN ACTIVATION CODE -->
+      <div class="code-input-wrap">
+        <input type="text" class="code-input" id="adminCodeInput" placeholder="Enter activation code..." maxlength="20">
+        <button class="code-activate-btn" onclick="activateWithCode()">ACTIVATE</button>
+      </div>
+      <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:8px;">
+        Admin-issued codes grant instant premium access. Contact your admin to get one.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MAIN PAGE ══ -->
+<div class="container">
+
+  <!-- PWA Install Banner -->
+  <div class="install-banner" id="installBanner">
+    <div class="install-text"><strong>📲 Install ViewPulse</strong> — Add to your home screen for the best experience</div>
+    <div style="display:flex;gap:8px;">
+      <button class="install-btn" onclick="installPWA()">Install App</button>
+      <button class="install-dismiss" onclick="dismissInstall()">✕</button>
+    </div>
+  </div>
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <button class="theme-toggle" onclick="toggleTheme()" id="themeToggleBtn">🌙 Dark Mode</button>
+    <button class="premium-pill" id="premiumBtn" onclick="openPremiumModal()">👑 Go Premium</button>
+  </div>
+
+  <header>
+    <div class="logo">ViewPulse</div>
+    <div class="tagline">// Automate · Amplify · Accelerate</div>
+    <div class="status-bar">
+      <div class="stat-pill"><span class="dot"></span> System Online</div>
+      <div class="stat-pill"><span class="dot"></span> No Sign-in Required</div>
+      <div class="stat-pill" id="premiumStatusPill"><span class="dot" style="background:var(--muted);box-shadow:none;animation:none;"></span> Free Plan</div>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════
+       ADSENSE SLOT — TOP BANNER
+       Publisher: ca-pub-8714103186224868
+  ══════════════════════════════════════════ -->
+  <div class="adsense-slot" id="adsense-top">
+    <ins class="adsbygoogle"
+         style="display:block;width:100%;"
+         data-ad-client="ca-pub-8714103186224868"
+         data-ad-slot="YOUR_TOP_BANNER_AD_SLOT_ID"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <!-- Fallback placeholder -->
+    <div class="ad-placeholder" id="topAdFallback">
+      <div class="ad-ph-icon" id="topAdIcon">📣</div>
+      <div class="ad-ph-text">
+        <h4 id="topAdTitle">Scale Your Brand — Fast</h4>
+        <p id="topAdDesc">AI-powered ads on YouTube, TikTok & Instagram. Try free today.</p>
+      </div>
+      <button class="ad-ph-cta">Learn More →</button>
+    </div>
+  </div>
+
+  <!-- CONFIG CARD -->
+  <div class="main-card">
+    <div class="card-header">
+      <div class="card-header-icon" style="background:rgba(0,229,255,0.1);">🎯</div>
+      <div>
+        <div class="card-title">Configure Your Boost Session</div>
+        <div class="card-subtitle">// paste your link and set parameters</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="url-section">
+        <div class="label">Target URL <span class="label-badge">REQUIRED</span></div>
+        <div class="url-input-wrap">
+          <span class="platform-icon" id="platformIcon">🔗</span>
+          <input type="url" class="url-input" id="urlInput"
+            placeholder="https://youtube.com/watch?v=... or tiktok.com/@user/video/..."
+            oninput="detectPlatform(this.value)" />
+        </div>
+        <div class="url-hint" id="urlHint">Supports <span>YouTube</span>, <span>TikTok</span>, and <span>any website URL</span></div>
+      </div>
+
+      <div class="controls-grid">
+        <div class="control-group">
+          <div class="label">Iframe Tabs</div>
+          <div class="slider-value" id="winVal">10 <span>tabs</span></div>
+          <div class="slider-track">
+            <div class="slider-fill"  id="winFill"  style="width:33.3%"></div>
+            <div class="slider-thumb" id="winThumb" style="left:33.3%"></div>
+            <input type="range" min="5" max="20" value="10" id="winSlider" oninput="updateSlider('win',this.value)">
+          </div>
+          <div class="slider-minmax"><span id="sliderMin">5</span><span id="sliderMax">20</span></div>
+          <div class="premium-slider-note" id="premiumSliderNote">👑 Premium: up to 100 tabs unlocked</div>
+        </div>
+        <div class="control-group">
+          <div class="label">Reset Interval</div>
+          <div class="slider-value" id="timerVal">3 <span>minutes</span></div>
+          <div class="slider-track">
+            <div class="slider-fill"  id="timerFill"  style="width:33.3%"></div>
+            <div class="slider-thumb" id="timerThumb" style="left:33.3%"></div>
+            <input type="range" min="2" max="5" value="3" id="timerSlider" oninput="updateSlider('timer',this.value)">
+          </div>
+          <div class="slider-minmax"><span>2 min</span><span>5 min</span></div>
+        </div>
+      </div>
+
+      <div class="notice">
+        <strong>⚡ How it works:</strong> ViewPulse loads your URL in multiple iframes inside this page. YouTube &amp; TikTok embed players are used automatically. Every tab reloads on your chosen interval. <span id="premiumNotice" style="display:none;color:var(--gold);">👑 Premium: up to 100 tabs, no session ads.</span>
+      </div>
+
+      <button class="launch-btn" id="launchBtn" onclick="startSession()">
+        ⚡ LAUNCH BOOST SESSION
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       ADSENSE SLOT — MID PAGE
+       Publisher: ca-pub-8714103186224868
+  ══════════════════════════════════════════ -->
+  <div class="adsense-slot" id="adsense-mid">
+    <ins class="adsbygoogle"
+         style="display:block;width:100%;"
+         data-ad-client="ca-pub-8714103186224868"
+         data-ad-slot="YOUR_MID_AD_SLOT_ID"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+  </div>
+
+  <!-- SESSION PANEL -->
+  <div class="session-panel" id="sessionPanel">
+    <div class="session-header">
+      <div class="session-title">
+        📡 Active Session
+        <div class="live-badge"><span class="dot"></span> LIVE</div>
+      </div>
+      <button class="stop-btn" onclick="stopSession()">■ Stop Session</button>
+    </div>
+    <div class="tabs-nav" id="tabsNav"></div>
+    <div class="global-progress"><div class="global-progress-fill" id="globalProgressFill"></div></div>
+    <div class="iframe-viewport" id="iframeViewport"></div>
+
+    <!-- ══════════════════════════════════════════
+         ADSENSE SLOT — IN-SESSION STRIP
+         (hidden for premium users)
+    ══════════════════════════════════════════ -->
+    <div class="session-adsense" id="sessionAdsenseWrap">
+      <div class="adsense-slot" style="margin:16px 0 8px;" id="adsense-session">
+        <ins class="adsbygoogle"
+             style="display:block;width:100%;"
+             data-ad-client="ca-pub-8714103186224868"
+             data-ad-slot="YOUR_SESSION_AD_SLOT_ID"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+      </div>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-cell"><div class="stat-num" id="statViews">0</div><div class="stat-lbl">Total Views</div></div>
+      <div class="stat-cell"><div class="stat-num" id="statCycles">0</div><div class="stat-lbl">Refresh Cycles</div></div>
+      <div class="stat-cell"><div class="stat-num" id="statUptime">0:00</div><div class="stat-lbl">Session Uptime</div></div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="how-grid">
+    <div class="how-card"><div class="how-num">01</div><div class="how-title">Paste Your Link</div><div class="how-desc">Drop in any YouTube, TikTok, or website URL.</div></div>
+    <div class="how-card"><div class="how-num">02</div><div class="how-title">Set Parameters</div><div class="how-desc">Choose 5–20 iframe tabs (100 with Premium) and 2–5 min refresh.</div></div>
+    <div class="how-card"><div class="how-num">03</div><div class="how-title">Watch an Ad</div><div class="how-desc">A 15-second ad plays before each free session to keep ViewPulse running.</div></div>
+    <div class="how-card"><div class="how-num">04</div><div class="how-title">Boost &amp; Track</div><div class="how-desc">Iframes reload on schedule. Watch view counts climb live on the dashboard.</div></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       ADSENSE SLOT — BOTTOM / FOOTER
+       Publisher: ca-pub-8714103186224868
+  ══════════════════════════════════════════ -->
+  <div class="adsense-slot" id="adsense-bottom">
+    <ins class="adsbygoogle"
+         style="display:block;width:100%;"
+         data-ad-client="ca-pub-8714103186224868"
+         data-ad-slot="YOUR_BOTTOM_AD_SLOT_ID"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+  </div>
+
+  <footer>
+    © 2025 ViewPulse — Boost responsibly. All platforms' terms of service apply.
+    &nbsp;·&nbsp; <a href="#" onclick="openPremiumModal();return false;" style="color:var(--accent);text-decoration:none;">Upgrade to Premium 👑</a>
+  </footer>
+</div>
+
+<!-- ══ PAYSTACK SDK ══ -->
+<script src="https://js.paystack.co/v1/inline.js"></script>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  CONFIGURATION — edit these values
+// ═══════════════════════════════════════════════════════════
+const CONFIG = {
+  paystackPublicKey: 'pk_live_YOUR_PAYSTACK_PUBLIC_KEY', // ← replace with your Paystack public key
+  plans: {
+    monthly: { amount: 250000, label: 'Monthly Premium', duration: 30  }, // amount in kobo (₦2500)
+    annual:  { amount: 2000000, label: 'Annual Premium',  duration: 365 }, // ₦20000
+  },
+  // Admin activation codes — add as many as you like
+  // Format: 'CODE': { plan:'Pro', days: 30 }
+  // IMPORTANT: Change these before deploying!
+  adminCodes: {
+    'VPRO2025':   { plan:'Pro',        days: 30  },
+    'VIPYEAR01':  { plan:'Annual Pro', days: 365 },
+    'ADMIN999':   { plan:'Lifetime',   days: 36500 },
+    'TESTPREMIUM':{ plan:'Trial',      days: 7   },
+  }
+};
+
+// ═══════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════
+let sessionActive   = false;
+let windowCount     = 10;
+let intervalMinutes = 3;
+let sessionInterval = null;
+let uptimeInterval  = null;
+let totalViews      = 0;
+let totalCycles     = 0;
+let sessionStart    = null;
+let windowStates    = [];
+let activeTab       = 0;
+let currentUrl      = '';
+let selectedPlan    = 'annual';
+let isPremium       = false;
+let deferredInstall = null;
+
+// ═══════════════════════════════════════════════════════════
+//  THEME
+// ═══════════════════════════════════════════════════════════
+function initTheme() {
+  const saved = localStorage.getItem('vp_theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  updateThemeBtn(saved);
+}
+
+function toggleTheme() {
+  const cur  = document.documentElement.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('vp_theme', next);
+  updateThemeBtn(next);
+}
+
+function updateThemeBtn(theme) {
+  const btn = document.getElementById('themeToggleBtn');
+  btn.textContent = theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PREMIUM
+// ═══════════════════════════════════════════════════════════
+function loadPremiumState() {
+  const data = localStorage.getItem('vp_premium');
+  if (!data) return;
+  try {
+    const obj = JSON.parse(data);
+    if (new Date(obj.expiry) > new Date()) {
+      isPremium = true;
+      applyPremiumUI(obj);
+    } else {
+      localStorage.removeItem('vp_premium');
+    }
+  } catch(e) {}
+}
+
+function applyPremiumUI(obj) {
+  isPremium = true;
+  const btn = document.getElementById('premiumBtn');
+  btn.textContent = '👑 Premium Active';
+  btn.classList.add('active-plan');
+  document.getElementById('premiumStatusPill').innerHTML = '<span class="dot" style="background:var(--gold);box-shadow:0 0 7px var(--gold);animation:pulse 1.5s infinite;"></span> Premium';
+  document.getElementById('premiumSliderNote').classList.add('show');
+  document.getElementById('premiumNotice').style.display = 'inline';
+  // Expand slider to 100
+  const slider = document.getElementById('winSlider');
+  slider.max = '100';
+  document.getElementById('sliderMax').textContent = '100';
+  // Hide session ads
+  const wrap = document.getElementById('sessionAdsenseWrap');
+  if (wrap) wrap.style.display = 'none';
+}
+
+function openPremiumModal() {
+  const modal = document.getElementById('premiumModal');
+  const data  = localStorage.getItem('vp_premium');
+  if (data) {
+    const obj = JSON.parse(data);
+    document.getElementById('premiumActiveView').style.display = 'block';
+    document.getElementById('premiumSignupView').style.display  = 'none';
+    document.getElementById('premiumPlanName').textContent = obj.plan;
+    document.getElementById('premiumExpiry').textContent  = 'Expires: ' + new Date(obj.expiry).toLocaleDateString();
+  } else {
+    document.getElementById('premiumActiveView').style.display = 'none';
+    document.getElementById('premiumSignupView').style.display  = 'block';
+  }
+  modal.classList.add('show');
+}
+
+function closePremiumModal() {
+  document.getElementById('premiumModal').classList.remove('show');
+}
+
+function selectPlan(plan) {
+  selectedPlan = plan;
+  document.getElementById('planMonthly').classList.toggle('selected', plan==='monthly');
+  document.getElementById('planAnnual').classList.toggle('selected',  plan==='annual');
+}
+
+function deactivatePremium() {
+  localStorage.removeItem('vp_premium');
+  isPremium = false;
+  location.reload();
+}
+
+// ─── Activate via admin code ───────────────────────────────
+function activateWithCode() {
+  const raw  = document.getElementById('adminCodeInput').value.trim().toUpperCase();
+  const code = CONFIG.adminCodes[raw];
+  if (!code) { showToast('Invalid activation code', 'error'); return; }
+
+  const expiry = new Date();
+  expiry.setDate(expiry.getDate() + code.days);
+  const obj = { plan: code.plan, expiry: expiry.toISOString(), method:'code' };
+  localStorage.setItem('vp_premium', JSON.stringify(obj));
+  applyPremiumUI(obj);
+  closePremiumModal();
+  showToast(`👑 ${code.plan} activated! ${code.days} days access granted.`, 'success');
+}
+
+// ─── Paystack payment ──────────────────────────────────────
+function initiatePaystack() {
+  const plan   = CONFIG.plans[selectedPlan];
+  const email  = prompt('Enter your email address to proceed with payment:');
+  if (!email || !email.includes('@')) { showToast('Please enter a valid email', 'error'); return; }
+
+  if (typeof PaystackPop === 'undefined') {
+    showToast('Paystack SDK not loaded. Check your internet connection.', 'error');
+    return;
+  }
+
+  const handler = PaystackPop.setup({
+    key:       CONFIG.paystackPublicKey,
+    email:     email,
+    amount:    plan.amount,
+    currency:  'NGN',
+    ref:       'VP_' + Date.now(),
+    metadata:  { plan: selectedPlan },
+    callback:  function(response) {
+      // Payment verified — activate premium
+      const expiry = new Date();
+      expiry.setDate(expiry.getDate() + plan.duration);
+      const obj = { plan: plan.label, expiry: expiry.toISOString(), method:'paystack', ref: response.reference, email };
+      localStorage.setItem('vp_premium', JSON.stringify(obj));
+      applyPremiumUI(obj);
+      closePremiumModal();
+      showToast(`🎉 Payment successful! ${plan.label} activated.`, 'success');
+    },
+    onClose: function() {
+      showToast('Payment window closed', 'warning');
+    }
+  });
+  handler.openIframe();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SLIDERS
+// ═══════════════════════════════════════════════════════════
+function updateSlider(type, val) {
+  val = parseInt(val);
+  if (type === 'win') {
+    windowCount = val;
+    document.getElementById('winVal').innerHTML = `${val} <span>tabs</span>`;
+    const max = isPremium ? 100 : 20;
+    const p   = ((val - 5) / (max - 5)) * 100;
+    document.getElementById('winFill').style.width  = p + '%';
+    document.getElementById('winThumb').style.left  = p + '%';
+  } else {
+    intervalMinutes = val;
+    document.getElementById('timerVal').innerHTML = `${val} <span>minutes</span>`;
+    const p = ((val-2)/3)*100;
+    document.getElementById('timerFill').style.width  = p + '%';
+    document.getElementById('timerThumb').style.left  = p + '%';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PLATFORM DETECT
+// ═══════════════════════════════════════════════════════════
+function detectPlatform(url) {
+  const icon = document.getElementById('platformIcon');
+  const hint = document.getElementById('urlHint');
+  if (!url) { icon.textContent='🔗'; hint.innerHTML='Supports <span>YouTube</span>, <span>TikTok</span>, and <span>any website URL</span>'; return; }
+  if (url.includes('youtube.com')||url.includes('youtu.be')) { icon.textContent='▶️'; hint.innerHTML='<span>YouTube detected</span> — embed player used'; }
+  else if (url.includes('tiktok.com'))                        { icon.textContent='🎵'; hint.innerHTML='<span>TikTok detected</span> — embed player used'; }
+  else                                                         { icon.textContent='🌐'; hint.innerHTML='<span>Website detected</span> — loads directly in iframe'; }
+}
+
+function buildEmbedUrl(url) {
+  const ytM = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  if (ytM) return `https://www.youtube.com/embed/${ytM[1]}?autoplay=1&mute=0`;
+  const ttM = url.match(/tiktok\.com\/@[^/]+\/video\/(\d+)/);
+  if (ttM) return `https://www.tiktok.com/embed/v2/${ttM[1]}`;
+  return null;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  AD MODAL (15 seconds) — AdSense powered
+// ═══════════════════════════════════════════════════════════
+const ads = [
+  { emoji:'🚀', title:'ProBoost Growth Suite',      desc:'Reach millions with targeted social campaigns. Used by 50K+ creators.' },
+  { emoji:'💰', title:'Creator Fund Network',        desc:'Earn $0.05–$0.20 per 1000 views across platforms automatically.'      },
+  { emoji:'📊', title:'Analytics Dashboard Pro',     desc:'Deep insights into your audience, growth trends, and revenue.'        },
+  { emoji:'🎬', title:'TubeEdit AI — Video Editor',  desc:'Auto-edit raw footage into viral-ready shorts in 5 minutes.'          },
+  { emoji:'📱', title:'ShortsFactory AI',            desc:'Turn any long video into 10 viral shorts. Powered by AI.'             },
+];
+let adIdx = 0;
+let adTimerI = null;
+const AD_SECS = 15;
+const CIRC    = 213.6;
+
+function showAdModal(onComplete) {
+  // Premium users skip the ad modal
+  if (isPremium) { onComplete && onComplete(); return; }
+
+  const ad = ads[adIdx++ % ads.length];
+  document.getElementById('adModalEmoji').textContent = ad.emoji;
+  document.getElementById('adModalTitle').textContent = ad.title;
+  document.getElementById('adModalDesc').textContent  = ad.desc;
+  document.getElementById('adOverlay').classList.add('show');
+  document.getElementById('adSkipBtn').classList.remove('show');
+  document.getElementById('adSkipNote').style.display = 'block';
+
+  // Push new AdSense ad into modal slot
+  try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) {}
+
+  const ring = document.getElementById('adRingFill');
+  ring.style.transition = 'none'; ring.style.strokeDashoffset = '0';
+  const bar = document.getElementById('adProgressFill');
+  bar.style.transition='none'; bar.style.width='100%';
+
+  let secs = AD_SECS;
+  document.getElementById('adTimerNum').textContent      = secs;
+  document.getElementById('adSkipCountdown').textContent = secs;
+  clearInterval(adTimerI);
+
+  requestAnimationFrame(() => {
+    bar.style.transition = `width ${AD_SECS}s linear`;
+    bar.style.width = '0%';
+  });
+
+  adTimerI = setInterval(() => {
+    secs--;
+    ring.style.transition = 'stroke-dashoffset 1s linear';
+    ring.style.strokeDashoffset = CIRC * (1 - secs/AD_SECS);
+    document.getElementById('adTimerNum').textContent      = Math.max(0, secs);
+    document.getElementById('adSkipCountdown').textContent = Math.max(0, secs);
+    if (secs <= 0) {
+      clearInterval(adTimerI);
+      document.getElementById('adTimerNum').textContent = '✓';
+      document.getElementById('adSkipNote').style.display = 'none';
+      document.getElementById('adSkipBtn').classList.add('show');
+      window._adOnComplete = onComplete || null;
+    }
+  }, 1000);
+}
+
+window._adOnComplete = null;
+function closeAd() {
+  document.getElementById('adOverlay').classList.remove('show');
+  clearInterval(adTimerI);
+  if (window._adOnComplete) { const f=window._adOnComplete; window._adOnComplete=null; f(); }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SESSION
+// ═══════════════════════════════════════════════════════════
+function startSession() {
+  const url = document.getElementById('urlInput').value.trim();
+  if (!url) { showToast('Please enter a URL first','error'); return; }
+  try { new URL(url); } catch { showToast('Please enter a valid URL','error'); return; }
+  currentUrl = url;
+  showAdModal(() => buildIframes(url));
+}
+
+function buildIframes(url) {
+  const totalSecs = intervalMinutes * 60;
+  windowStates=[]; activeTab=0;
+  const tabsNav  = document.getElementById('tabsNav');
+  const viewport = document.getElementById('iframeViewport');
+  tabsNav.innerHTML=''; viewport.innerHTML='';
+
+  const embedSrc = buildEmbedUrl(url);
+
+  for (let i = 0; i < windowCount; i++) {
+    const offset   = Math.floor(Math.random() * Math.min(30, totalSecs * 0.15));
+    const initSecs = totalSecs - offset;
+    windowStates.push({ seconds:initSecs, totalSeconds:totalSecs, views:1, status:'loaded' });
+
+    // Tab button
+    const tab = document.createElement('button');
+    tab.className=`tab-btn loaded`; tab.id=`tab_${i}`;
+    tab.onclick=()=>switchTab(i);
+    tab.innerHTML=`<span class="tab-dot"></span><span>TAB ${String(i+1).padStart(2,'0')}</span><span class="tab-timer" id="tabT_${i}">${fmtTime(initSecs)}</span>`;
+    tabsNav.appendChild(tab);
+
+    // Slot
+    const slot=document.createElement('div');
+    slot.className=`iframe-slot${i===0?' active':''}`; slot.id=`slot_${i}`;
+
+    const barHtml=`<div class="iframe-bar">
+      <span style="font-size:14px">${embedSrc?(url.includes('tiktok')?'🎵':'▶️'):'🌐'}</span>
+      <div class="iframe-bar-url">${url}</div>
+      ${embedSrc?'':`<button class="iframe-bar-reload" onclick="manualReload(${i})">↺ Reload</button>`}
+      <div class="iframe-bar-views" id="barV_${i}">Views: <strong>1</strong></div>
+    </div>`;
+
+    const cdHtml=`<div class="iframe-countdown" id="cdWrap_${i}">
+      <svg width="52" height="52" viewBox="0 0 52 52">
+        <circle fill="none" stroke="#1e2d3d" stroke-width="3" cx="26" cy="26" r="22"/>
+        <circle class="count-ring" id="cRing_${i}" cx="26" cy="26" r="22" stroke-dasharray="138" stroke-dashoffset="0"/>
+      </svg>
+      <div class="count-num" id="cNum_${i}">${fmtTime(initSecs)}</div>
+    </div>`;
+
+    slot.innerHTML = embedSrc
+      ? `${barHtml}<iframe class="content-frame" id="iframe_${i}" src="${embedSrc}" allow="autoplay;fullscreen;picture-in-picture" allowfullscreen loading="lazy"></iframe>${cdHtml}`
+      : `${barHtml}<iframe class="content-frame" id="iframe_${i}" src="${url}" sandbox="allow-scripts allow-same-origin allow-forms allow-popups" loading="lazy"></iframe>${cdHtml}`;
+    viewport.appendChild(slot);
+  }
+
+  sessionActive=true; sessionStart=Date.now();
+  totalViews=windowCount; totalCycles=1;
+  document.getElementById('statViews').textContent  = totalViews;
+  document.getElementById('statCycles').textContent = totalCycles;
+  document.getElementById('sessionPanel').classList.add('active');
+  document.getElementById('launchBtn').disabled=true;
+  switchTab(0);
+  showToast(`🚀 ${windowCount} iframes launched!`,'success');
+
+  // Push AdSense ads on page
+  try { (adsbygoogle=window.adsbygoogle||[]).push({}); } catch(e){}
+
+  sessionInterval=setInterval(tick,1000);
+  uptimeInterval=setInterval(()=>{
+    document.getElementById('statUptime').textContent=fmtTime(Math.floor((Date.now()-sessionStart)/1000));
+  },1000);
+}
+
+// ── Tick ──
+function tick() {
+  if (!sessionActive) return;
+  const RING=138;
+  const ws0=windowStates[0];
+  if (ws0) {
+    const pct=((ws0.totalSeconds-ws0.seconds)/ws0.totalSeconds)*100;
+    document.getElementById('globalProgressFill').style.width=pct+'%';
+  }
+  for (let i=0;i<windowCount;i++) {
+    const ws=windowStates[i]; ws.seconds--;
+    const offset=RING*(1-ws.seconds/ws.totalSeconds);
+    const warn=ws.seconds<=15;
+    const ring=document.getElementById(`cRing_${i}`);
+    const num=document.getElementById(`cNum_${i}`);
+    const tabT=document.getElementById(`tabT_${i}`);
+    if (ring){ ring.style.strokeDashoffset=offset; ring.classList.toggle('warn',warn); }
+    if (num) { num.textContent=fmtTime(ws.seconds); num.classList.toggle('warn',warn); }
+    if (tabT) tabT.textContent=fmtTime(ws.seconds);
+
+    if (ws.seconds<=0) {
+      ws.seconds=ws.totalSeconds; ws.views++; totalViews++; totalCycles++;
+      document.getElementById('statViews').textContent=totalViews;
+      document.getElementById('statCycles').textContent=totalCycles;
+      const barV=document.getElementById(`barV_${i}`);
+      if (barV) barV.innerHTML=`Views: <strong>${ws.views}</strong>`;
+      reloadSlot(i);
+      setTabStatus(i,'resetting');
+      setTimeout(()=>{ if(sessionActive) setTabStatus(i,'loaded'); },2000);
+      // Refresh AdSense on every 10th cycle
+      if (totalCycles%10===0) { try{(adsbygoogle=window.adsbygoogle||[]).push({});}catch(e){} }
+    }
+  }
+}
+
+function reloadSlot(i) {
+  const f=document.getElementById(`iframe_${i}`);
+  if (!f) return; const s=f.src; f.src=''; setTimeout(()=>{ f.src=s; },300);
+}
+
+function manualReload(i) {
+  reloadSlot(i); windowStates[i].seconds=windowStates[i].totalSeconds;
+  windowStates[i].views++; totalViews++;
+  document.getElementById('statViews').textContent=totalViews;
+  const barV=document.getElementById(`barV_${i}`);
+  if (barV) barV.innerHTML=`Views: <strong>${windowStates[i].views}</strong>`;
+  showToast(`Tab ${i+1} reloaded`,'success');
+}
+
+function switchTab(i) {
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.iframe-slot').forEach(s=>s.classList.remove('active'));
+  const tab=document.getElementById(`tab_${i}`);
+  const slot=document.getElementById(`slot_${i}`);
+  if (tab){ tab.classList.add('active'); tab.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'}); }
+  if (slot) slot.classList.add('active');
+  activeTab=i;
+}
+
+function setTabStatus(i,status) {
+  const tab=document.getElementById(`tab_${i}`);
+  if (!tab) return;
+  tab.classList.remove('loading','loaded','resetting');
+  tab.classList.add(status);
+  if (windowStates[i]) windowStates[i].status=status;
+}
+
+function stopSession() {
+  sessionActive=false; clearInterval(sessionInterval); clearInterval(uptimeInterval);
+  document.getElementById('sessionPanel').classList.remove('active');
+  document.getElementById('launchBtn').disabled=false;
+  document.getElementById('iframeViewport').innerHTML='';
+  document.getElementById('tabsNav').innerHTML='';
+  totalViews=totalCycles=0;
+  document.getElementById('statViews').textContent='0';
+  document.getElementById('statCycles').textContent='0';
+  document.getElementById('statUptime').textContent='0:00';
+  showToast('Session stopped','warning');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PWA
+// ═══════════════════════════════════════════════════════════
+function buildManifest() {
+  const manifest = {
+    name: 'ViewPulse',
+    short_name: 'ViewPulse',
+    description: 'Boost your YouTube, TikTok and website views automatically.',
+    start_url: './',
+    display: 'standalone',
+    background_color: '#070a0f',
+    theme_color: '#00e5ff',
+    orientation: 'portrait-primary',
+    icons: [
+      { src:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="40" fill="%23070a0f"/><text x="96" y="130" font-size="100" text-anchor="middle">⚡</text></svg>', sizes:'192x192', type:'image/svg+xml' },
+      { src:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="80" fill="%23070a0f"/><text x="256" y="360" font-size="280" text-anchor="middle">⚡</text></svg>', sizes:'512x512', type:'image/svg+xml' }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type:'application/manifest+json'});
+  const url  = URL.createObjectURL(blob);
+  document.getElementById('pwaManifest').href = url;
+}
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault(); deferredInstall=e;
+  document.getElementById('installBanner').classList.add('show');
+});
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('installBanner').classList.remove('show');
+  showToast('ViewPulse installed successfully! 📲','success');
+});
+
+function installPWA() {
+  if (!deferredInstall) { showToast('Open this page in Chrome/Edge to install','warning'); return; }
+  deferredInstall.prompt();
+  deferredInstall.userChoice.then(c=>{
+    if (c.outcome==='accepted') showToast('Installing ViewPulse...','success');
+    deferredInstall=null;
+    document.getElementById('installBanner').classList.remove('show');
+  });
+}
+
+function dismissInstall() {
+  document.getElementById('installBanner').classList.remove('show');
+}
+
+// Register service worker for offline/PWA caching
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE='viewpulse-v1';
+    const PRECACHE=['./', './index.html'];
+    self.addEventListener('install', e=>{
+      e.waitUntil(caches.open(CACHE).then(c=>c.addAll(PRECACHE)).then(()=>self.skipWaiting()));
+    });
+    self.addEventListener('activate', e=>{
+      e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));
+    });
+    self.addEventListener('fetch', e=>{
+      e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>caches.match('./'))));
+    });
+  `;
+  const blob = new Blob([swCode],{type:'application/javascript'});
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(()=>{});
+}
+
+// ═══════════════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════════════
+function fmtTime(s) { s=Math.max(0,s); return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`; }
+
+function showToast(msg,type='success') {
+  const icons={success:'✅',warning:'⚠️',error:'❌'};
+  const c=document.getElementById('toastContainer'),t=document.createElement('div');
+  t.className=`toast ${type}`; t.innerHTML=`<span>${icons[type]}</span> ${msg}`;
+  c.appendChild(t); setTimeout(()=>t.remove(),3800);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', ()=>{
+  initTheme();
+  loadPremiumState();
+  buildManifest();
+
+  // Push all visible AdSense units
+  setTimeout(()=>{
+    try {
+      const units = document.querySelectorAll('.adsbygoogle');
+      units.forEach(()=>{ try{(adsbygoogle=window.adsbygoogle||[]).push({});}catch(e){} });
+    } catch(e){}
+  }, 1000);
+});
+</script>
+</body>
+</html>
